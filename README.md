@@ -3,8 +3,13 @@ Temporary immutablity for EOSIO smart contracts
 Locks your EOSIO account and ensures that your smart contract is immutable for a given time period
 
 A completely secure dapp that can only restore the owner and active keys after a pre-defined time
+
 Developed as a smart contract on the Eos mainnet
+
 Ensures that no-one has control of a given account while locked
+
+
+
 
 GETTING LOCKED
 
