@@ -24,11 +24,13 @@ cleos set account permission YOUR_CONTRACT owner ‘{“threshold”: 1,”keys�
 target_contract: [YOUR_CONTRACT]
 lock_time: [insert the lock time period in seconds]
 public_key_string: [insert the public key that should be used to restore your account after the lock time has expired]
+
 Warning: make sure to insert correctly your public key string or you might permanently loose control of your account.
 
 3. After the lock time has expired, call the unlock action of the accountlock1 contract to restore the owner authority:
 
 target_contract: [YOUR_CONTRACT]
+
 This action will unlock your account by setting the public_key_string provided at the previous step as the new owner authority.
 
 PROOF OF LOCK AND EXPIRY TIME
