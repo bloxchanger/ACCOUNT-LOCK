@@ -4,7 +4,7 @@ Locks your EOSIO account and ensures that your smart contract is immutable for a
 
 A completely secure dapp that can only restore the owner and active keys after a pre-defined time
 
-Developed as a smart contract on the Eos mainnet
+Developed as a smart contract on the Eos mainnet and the Telos mainnet
 
 Ensures that no-one has control of a given account while locked
 
