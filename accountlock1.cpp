@@ -1,25 +1,5 @@
 #include "accountlock1.hpp"
 
-void accountlock1::settarget(name mytarget) {
-
-    auto state = _myConfig.find(0);
-    if (state == _myConfig.end()) {
-        _myConfig.emplace(_self,  [&](auto& newrow) {
-            newrow.id = 0;
-            newrow.receiver_account = mytarget;
-        });
-    }
-    else {
-        auto& itr = _myConfig.get(0);
-        require_auth(itr.receiver_account);
-        _myConfig.modify(itr, _self,  [&](auto& row) {
-            row.receiver_account = mytarget;
-        });
-    }
-
-}
-
-
 
 void accountlock1::lock(name target_contract, uint64_t lock_time, string public_key_str) {
 require_auth(target_contract);
@@ -172,27 +152,14 @@ for(auto& myindex : _myItems) {
 
 
 void accountlock1::transfer(name from, name to, asset quantity, string memo) {
-    auto& itr = _myConfig.get(0);
     
     if(from !=_self && to == _self){
             
-          eosio_assert(quantity.symbol.is_valid(),"invalid quantity");
-          eosio_assert(quantity.amount>0, "only positive quantity allowed");
-          eosio_assert(quantity.symbol == EOS_SYMBOL, "only EOS tokens allowed");
-          
-          // send amount to the account specified in config.sendeverythingto---------------------------- 
-          action(
-            permission_level{_self, "active"_n},
-            "eosio.token"_n, "transfer"_n,
-            std::make_tuple(_self, itr.receiver_account, quantity, string("redirect from accountlock1"))
-          ).send();
-          //--------------------------------------------------------------------------------
+          eosio_assert(to != _self,"please do not send any token to this account");
 
      }
    
 }
-
-
 
 extern "C" void apply(uint64_t receiver, uint64_t code, uint64_t action)
 {
@@ -202,10 +169,10 @@ extern "C" void apply(uint64_t receiver, uint64_t code, uint64_t action)
   else {
     switch (action) 
     {
-      EOSIO_DISPATCH_HELPER(accountlock1, (settarget)(lock)(unlock))
+      EOSIO_DISPATCH_HELPER(accountlock1, (lock)(unlock))
     }
   }
 
 }
 
-
+//{}

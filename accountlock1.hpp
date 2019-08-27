@@ -1,18 +1,13 @@
 #include <eosiolib/eosio.hpp>
-#include <eosiolib/asset.hpp>
 #include <eosiolib/time.hpp>
-
+#include <eosiolib/asset.hpp>
 #include <eosiolib/action.hpp>
-#include <eosiolib/symbol.hpp>
 #include <eosiolib/crypto.h>
 #include <cstring>
 #include <string.h>
 using namespace eosio;
 using namespace std;
 
-
-
-#define EOS_SYMBOL symbol("EOS", 4)
 
 class [[eosio::contract]] accountlock1 : public eosio::contract {
 
@@ -41,17 +36,6 @@ class [[eosio::contract]] accountlock1 : public eosio::contract {
 	        vector<wait_weight> waits;
 	    };
 
-
-    
-	    struct [[eosio::table]] config {
-            uint64_t id;
-	     	name receiver_account;  // set an address to which any transfer will be forwarded
-	    
-            auto primary_key() const { return id; }
-        };
-        typedef eosio::multi_index<"setup"_n, config> settings_table;
-        settings_table _myConfig;
-
     
 
          struct [[eosio::table]] item {
@@ -70,22 +54,18 @@ class [[eosio::contract]] accountlock1 : public eosio::contract {
     public:
 
     accountlock1( name receiver, name code, datastream<const char*> ds ):contract(receiver, code, ds)
-                                    , _myConfig(receiver, receiver.value) 
                                     , _myItems(receiver, receiver.value) 
                                     {}
 
-     [[eosio::action]]
-     void transfer(name from, name to, asset quantity, string memo);
-     
-     [[eosio::action]]  
-     void settarget(name mytarget);
-
+    
      [[eosio::action]]  
      void lock(name target_contract, uint64_t lock_time, string public_key_str);
 
      [[eosio::action]]  
      void unlock(name target_contract);
 
+    [[eosio::action]]
+    void transfer(name from, name to, asset quantity, string memo);
 
 };
 
