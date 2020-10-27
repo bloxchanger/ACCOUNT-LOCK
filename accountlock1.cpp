@@ -1,22 +1,26 @@
 #include "accountlock1.hpp"
 
 
-void accountlock1::lock(name target_contract, uint64_t lock_time, string public_key_str) {
+void accountlock1::lock(name target_contract, const time_point_sec &lock_time, string public_key_str) {
 require_auth(target_contract);
 
-eosio::time_point_sec unlock_time = eosio::time_point_sec(now() + lock_time);
+
+//Time format example: "2020-10-24T16:46:07"
+//time_point_sec unlock_time = current_time_point().sec_since_epoch() + lock_time;
+time_point_sec unlock_time = lock_time;
+
 
 			// CHECK PULIC KEY ---------------------------------------------------------------------------------
-			eosio_assert(public_key_str.length() == 53, "Length of public key should be 53");
+			check(public_key_str.length() == 53, "Length of public key should be 53");
     
             string pubkey_prefix("EOS");
             auto result = mismatch(pubkey_prefix.begin(), pubkey_prefix.end(), public_key_str.begin());
-            eosio_assert(result.first == pubkey_prefix.end(), "Public key should be prefix with EOS");
+            check(result.first == pubkey_prefix.end(), "Public key should be prefix with EOS");
             auto base58substr = public_key_str.substr(pubkey_prefix.length());
     
             vector<unsigned char> vch;
-            eosio_assert(decode_base58(base58substr, vch), "Decode pubkey failed");
-            eosio_assert(vch.size() == 37, "Invalid public key");
+            check(decode_base58(base58substr, vch), "Decode pubkey failed");
+            check(vch.size() == 37, "Invalid public key");
     
  
 	//set corresponding item
@@ -70,19 +74,19 @@ void accountlock1::unlock(name target_contract) {
 for(auto& myindex : _myItems) {
   if ( myindex.locked_contract == target_contract) {
       //if lock time has expired, restore owner's permission
-      eosio_assert(myindex.unlock_time != eosio::time_point_sec(0) && myindex.unlock_time <  eosio::time_point_sec(now()), "lock time not expired");
+      check(myindex.unlock_time != eosio::time_point_sec(0) && myindex.unlock_time <  eosio::time_point_sec(current_time_point()), "lock time not expired");
 
             string public_key_str = myindex.public_key_str;
-            eosio_assert(public_key_str.length() == 53, "Length of public key should be 53");
+            check(public_key_str.length() == 53, "Length of public key should be 53");
 
             string pubkey_prefix("EOS");
             auto result = mismatch(pubkey_prefix.begin(), pubkey_prefix.end(), public_key_str.begin());
-            eosio_assert(result.first == pubkey_prefix.end(), "Public key should be prefix with EOS");
+            check(result.first == pubkey_prefix.end(), "Public key should be prefix with EOS");
             auto base58substr = public_key_str.substr(pubkey_prefix.length());
 
             vector<unsigned char> vch;
-            eosio_assert(decode_base58(base58substr, vch), "Decode pubkey failed");
-            eosio_assert(vch.size() == 37, "Invalid public key");
+            check(decode_base58(base58substr, vch), "Decode pubkey failed");
+            check(vch.size() == 37, "Invalid public key");
 
             array<unsigned char,33> pubkey_data;
             copy_n(vch.begin(), 33, pubkey_data.begin());
@@ -151,28 +155,12 @@ for(auto& myindex : _myItems) {
 
 
 
-void accountlock1::transfer(name from, name to, asset quantity, string memo) {
+void accountlock1::ontransfer(name from, name to, asset quantity, string memo) {
     
     if(from !=_self && to == _self){
             
-          eosio_assert(to != _self,"please do not send any token to this account");
+          check(to != _self,"please do not send any token to this account");
 
      }
    
 }
-
-extern "C" void apply(uint64_t receiver, uint64_t code, uint64_t action)
-{
-  if (code=="eosio.token"_n.value && action =="transfer"_n.value) {
-    eosio::execute_action(eosio::name(receiver), eosio::name(code), &accountlock1::transfer);
-  }
-  else {
-    switch (action) 
-    {
-      EOSIO_DISPATCH_HELPER(accountlock1, (lock)(unlock))
-    }
-  }
-
-}
-
-//{}

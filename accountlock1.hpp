@@ -1,12 +1,17 @@
-#include <eosiolib/eosio.hpp>
-#include <eosiolib/time.hpp>
-#include <eosiolib/asset.hpp>
-#include <eosiolib/action.hpp>
-#include <eosiolib/crypto.h>
+
+
+#include <eosio/asset.hpp>
+#include <eosio/crypto.hpp>
+#include <eosio/eosio.hpp>
+#include <eosio/system.hpp>
+#include <eosio/time.hpp>
+
+//#include <eosio/action.hpp>
 #include <cstring>
 #include <string.h>
 using namespace eosio;
 using namespace std;
+
 
 
 class [[eosio::contract]] accountlock1 : public eosio::contract {
@@ -58,14 +63,15 @@ class [[eosio::contract]] accountlock1 : public eosio::contract {
                                     {}
 
     
-     [[eosio::action]]  
-     void lock(name target_contract, uint64_t lock_time, string public_key_str);
+    [[eosio::action]] 
+    void lock(name target_contract, const time_point_sec &lock_time, string public_key_str); 
+    //void lock(name target_contract, uint64_t lock_time, string public_key_str);
 
-     [[eosio::action]]  
-     void unlock(name target_contract);
+    [[eosio::action]]  
+    void unlock(name target_contract);
 
-    [[eosio::action]]
-    void transfer(name from, name to, asset quantity, string memo);
+    [[eosio::on_notify("eosio.token::transfer")]]
+    void ontransfer(name from, name to, asset quantity, string memo);
 
 };
 
